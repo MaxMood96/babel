@@ -10,6 +10,7 @@ import {
 } from "@babel/types";
 import type { ExplodedVisitor, NodePath, Visitor } from "./index.ts";
 import type { ExplVisitNode, VisitNodeFunction, VisitPhase } from "./types.ts";
+import { requeueComputedKeyAndDecorators } from "./path/context.ts";
 
 type VIRTUAL_TYPES = keyof typeof virtualTypes;
 function isVirtualType(type: string): type is VIRTUAL_TYPES {
@@ -189,7 +190,7 @@ function verify$1(visitor: Visitor) {
 
     if (!TYPES.includes(nodeType)) {
       throw new Error(
-        `You gave us a visitor for the node type ${nodeType} but it's not a valid type`,
+        `You gave us a visitor for the node type ${nodeType} but it's not a valid type in @babel/traverse ${PACKAGE_JSON.version}`,
       );
     }
 
@@ -244,8 +245,14 @@ export function merge(
   states: any[] = [],
   wrapper?: VisitWrapper | null,
 ): ExplodedVisitor {
-  // @ts-expect-error don't bother with internal flags so it can work with earlier @babel/core validations
-  const mergedVisitor: ExplodedVisitor = {};
+  const mergedVisitor: ExplodedVisitor = { _verified: true, _exploded: true };
+  if (!process.env.BABEL_8_BREAKING) {
+    // For compatibility with old Babel versions, we must hide _verified and _exploded.
+    // Otherwise, old versions of the validator will throw sayng that `true` is not
+    // a function, because it tries to validate it as a visitor.
+    Object.defineProperty(mergedVisitor, "_exploded", { enumerable: false });
+    Object.defineProperty(mergedVisitor, "_verified", { enumerable: false });
+  }
 
   for (let i = 0; i < visitors.length; i++) {
     const visitor = explode$1(visitors[i]);
@@ -270,14 +277,6 @@ export function merge(
       const nodeVisitor = (mergedVisitor[key] ||= {});
       mergePair(nodeVisitor, typeVisitor);
     }
-  }
-
-  if (process.env.BABEL_8_BREAKING) {
-    return {
-      ...mergedVisitor,
-      _exploded: true,
-      _verified: true,
-    };
   }
 
   return mergedVisitor;
@@ -406,13 +405,29 @@ const _environmentVisitor: Visitor = {
 
     path.skip();
     if (path.isMethod()) {
-      path.requeueComputedKeyAndDecorators();
+      if (
+        !process.env.BABEL_8_BREAKING &&
+        !path.requeueComputedKeyAndDecorators
+      ) {
+        // See https://github.com/babel/babel/issues/16694
+        requeueComputedKeyAndDecorators.call(path);
+      } else {
+        path.requeueComputedKeyAndDecorators();
+      }
     }
   },
   Property(path) {
     if (path.isObjectProperty()) return;
     path.skip();
-    path.requeueComputedKeyAndDecorators();
+    if (
+      !process.env.BABEL_8_BREAKING &&
+      !path.requeueComputedKeyAndDecorators
+    ) {
+      // See https://github.com/babel/babel/issues/16694
+      requeueComputedKeyAndDecorators.call(path);
+    } else {
+      path.requeueComputedKeyAndDecorators();
+    }
   },
 };
 
