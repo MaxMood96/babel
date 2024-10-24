@@ -49,7 +49,8 @@
             "raw": "\"baz\""
           },
           "value": "baz"
-        }
+        },
+        "attributes": []
       },
       {
         "type": "ImportDeclaration",
@@ -80,7 +81,8 @@
             "raw": "'json-schema'"
           },
           "value": "json-schema"
-        }
+        },
+        "attributes": []
       },
       {
         "type": "ExportNamedDeclaration",
@@ -160,7 +162,8 @@
           },
           "value": "baz"
         },
-        "declaration": null
+        "declaration": null,
+        "attributes": []
       },
       {
         "type": "ExportNamedDeclaration",
@@ -192,7 +195,8 @@
           },
           "value": "baz"
         },
-        "declaration": null
+        "declaration": null,
+        "attributes": []
       },
       {
         "type": "ExportNamedDeclaration",
@@ -224,7 +228,8 @@
           },
           "value": "baz"
         },
-        "declaration": null
+        "declaration": null,
+        "attributes": []
       },
       {
         "type": "ExportNamedDeclaration",
@@ -256,7 +261,8 @@
           },
           "value": "baz"
         },
-        "declaration": null
+        "declaration": null,
+        "attributes": []
       },
       {
         "type": "ExportNamedDeclaration",
@@ -288,7 +294,8 @@
           },
           "value": "baz"
         },
-        "declaration": null
+        "declaration": null,
+        "attributes": []
       },
       {
         "type": "VariableDeclaration",
@@ -323,6 +330,7 @@
       {
         "type": "TSModuleDeclaration",
         "start":347,"end":648,"loc":{"start":{"line":17,"column":0,"index":347},"end":{"line":29,"column":1,"index":648}},
+        "kind": "module",
         "id": {
           "type": "StringLiteral",
           "start":362,"end":378,"loc":{"start":{"line":17,"column":15,"index":362},"end":{"line":17,"column":31,"index":378}},
@@ -414,7 +422,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -446,7 +455,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -478,7 +488,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -510,7 +521,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -542,7 +554,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "VariableDeclaration",
@@ -581,6 +594,7 @@
       {
         "type": "TSModuleDeclaration",
         "start":650,"end":1035,"loc":{"start":{"line":31,"column":0,"index":650},"end":{"line":46,"column":1,"index":1035}},
+        "kind": "module",
         "id": {
           "type": "StringLiteral",
           "start":665,"end":682,"loc":{"start":{"line":31,"column":15,"index":665},"end":{"line":31,"column":32,"index":682}},
@@ -623,7 +637,8 @@
                   "raw": "\"baz\""
                 },
                 "value": "baz"
-              }
+              },
+              "attributes": []
             },
             {
               "type": "ImportDeclaration",
@@ -654,7 +669,8 @@
                   "raw": "'json-schema'"
                 },
                 "value": "json-schema"
-              }
+              },
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -734,7 +750,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -766,7 +783,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -798,7 +816,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -830,7 +849,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "ExportNamedDeclaration",
@@ -862,7 +882,8 @@
                 },
                 "value": "baz"
               },
-              "declaration": null
+              "declaration": null,
+              "attributes": []
             },
             {
               "type": "VariableDeclaration",

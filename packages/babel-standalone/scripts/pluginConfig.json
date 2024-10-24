@@ -62,7 +62,7 @@
     "transform-private-methods",
     "transform-private-property-in-object",
     "proposal-record-and-tuple",
-    "proposal-regexp-modifiers",
+    "transform-regexp-modifiers",
     "proposal-throw-expressions",
     "transform-unicode-property-regex",
     "transform-unicode-sets-regex",
@@ -82,6 +82,7 @@
     "transform-function-name",
     "transform-instanceof",
     "transform-jscript",
+    "transform-json-modules",
     "transform-literals",
     "transform-member-expression-literals",
     "transform-modules-amd",
@@ -118,7 +119,6 @@
     "transform-unicode-escapes",
     "transform-unicode-regex",
     "proposal-explicit-resource-management",
-    "proposal-import-defer",
-    "proposal-json-modules"
+    "proposal-import-defer"
   ]
 }

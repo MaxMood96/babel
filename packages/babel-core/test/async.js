@@ -4,14 +4,20 @@ import * as babel from "../lib/index.js";
 
 import {
   spawnTransformAsync,
+  spawnTransformAsyncParallel,
   spawnTransformSync,
   supportsESM,
 } from "./helpers/esm.js";
 
-import { itGte, itESM } from "$repo-utils";
+import { itGte, itESM, itLt } from "$repo-utils";
 
 // "minNodeVersion": "8.0.0" <-- For Ctrl+F when dropping node 6
 const nodeGte8 = itGte("8.0.0");
+const nodeGte14 = itGte("14.8.0");
+
+// "minNodeVersion": "23.0.0" <-- For Ctrl+F when dropping node 22
+const nodeGte23 = itGte("23.0.0");
+const nodeLt23 = itLt("23.0.0");
 
 describe("asynchronicity", () => {
   const base = path.join(
@@ -151,22 +157,24 @@ describe("asynchronicity", () => {
         expect(() =>
           babel.transformSync(""),
         ).toThrowErrorMatchingInlineSnapshot(
-          `"unknown file: You appear to be using an plugin with an async .pre, which your current version` +
-            ` of Babel does not support. If you're using a published plugin, you may need to upgrade your` +
-            ` @babel/core version."`,
+          `"unknown file: You appear to be using an async plugin/preset, but Babel has been called synchronously"`,
         );
       });
 
       nodeGte8("called asynchronously", async () => {
         process.chdir("plugin-pre");
 
-        await expect(
-          babel.transformAsync(""),
-        ).rejects.toThrowErrorMatchingInlineSnapshot(
-          `"unknown file: You appear to be using an plugin with an async .pre, which your current version` +
-            ` of Babel does not support. If you're using a published plugin, you may need to upgrade your` +
-            ` @babel/core version."`,
-        );
+        await expect(babel.transformAsync("")).resolves.toMatchObject({
+          code: `"success"`,
+        });
+      });
+
+      nodeGte8("should await inherited .pre", async () => {
+        process.chdir("plugin-pre-chaining");
+
+        await expect(babel.transformAsync("")).resolves.toMatchObject({
+          code: `"pluginC,pluginB,pluginA"`,
+        });
       });
     });
 
@@ -177,22 +185,50 @@ describe("asynchronicity", () => {
         expect(() =>
           babel.transformSync(""),
         ).toThrowErrorMatchingInlineSnapshot(
-          `"unknown file: You appear to be using an plugin with an async .post, which your current version` +
-            ` of Babel does not support. If you're using a published plugin, you may need to upgrade your` +
-            ` @babel/core version."`,
+          `"unknown file: You appear to be using an async plugin/preset, but Babel has been called synchronously"`,
         );
       });
 
       nodeGte8("called asynchronously", async () => {
         process.chdir("plugin-post");
 
-        await expect(
-          babel.transformAsync(""),
-        ).rejects.toThrowErrorMatchingInlineSnapshot(
-          `"unknown file: You appear to be using an plugin with an async .post, which your current version` +
-            ` of Babel does not support. If you're using a published plugin, you may need to upgrade your` +
-            ` @babel/core version."`,
-        );
+        await expect(babel.transformAsync("")).resolves.toMatchObject({
+          code: `"success"`,
+        });
+      });
+
+      nodeGte8("should await inherited .post", async () => {
+        process.chdir("plugin-post-chaining");
+
+        await expect(babel.transformAsync("")).resolves.toMatchObject({
+          code: `"pluginC,pluginB,pluginA"`,
+        });
+      });
+    });
+
+    describe("PluginPass.isAsync", () => {
+      nodeGte8("called synchronously", () => {
+        process.chdir("plugin-pass-is-async");
+
+        expect(babel.transformSync("")).toMatchObject({
+          code: `"sync"`,
+        });
+      });
+
+      nodeGte8("called asynchronously", async () => {
+        process.chdir("plugin-pass-is-async");
+
+        await expect(babel.transformAsync("")).resolves.toMatchObject({
+          code: `"async"`,
+        });
+      });
+
+      nodeGte8("should await inherited .pre", async () => {
+        process.chdir("plugin-pre-chaining");
+
+        await expect(babel.transformAsync("")).resolves.toMatchObject({
+          code: `"pluginC,pluginB,pluginA"`,
+        });
       });
     });
 
@@ -216,13 +252,21 @@ describe("asynchronicity", () => {
     });
 
     (supportsESM ? describe : describe.skip)(".mjs files", () => {
-      it("called synchronously", async () => {
+      nodeLt23("called synchronously", async () => {
         process.chdir("plugin-mjs-native");
 
         await expect(spawnTransformSync()).rejects.toThrow(
           `[BABEL]: You appear to be using a native ECMAScript module plugin, which is` +
             ` only supported when running Babel asynchronously`,
         );
+      });
+
+      nodeGte23("called asynchronously", async () => {
+        process.chdir("plugin-mjs-native");
+
+        await expect(spawnTransformSync()).resolves.toMatchObject({
+          code: `"success"`,
+        });
       });
 
       it("called asynchronously", async () => {
@@ -232,6 +276,26 @@ describe("asynchronicity", () => {
           code: `"success"`,
         });
       });
+
+      nodeGte14("called asynchronously when contain TLA", async () => {
+        process.chdir("plugin-mjs-tla-native");
+
+        await expect(spawnTransformAsync()).resolves.toMatchObject({
+          code: `"success"`,
+        });
+      });
+
+      nodeGte14(
+        "called asynchronously twice in parallel when contain TLA",
+        async () => {
+          process.chdir("config-mjs-tla-native");
+
+          await expect(spawnTransformAsyncParallel()).resolves.toMatchObject([
+            { code: `"success"` },
+            { code: `"success"` },
+          ]);
+        },
+      );
     });
   });
 
@@ -280,13 +344,21 @@ describe("asynchronicity", () => {
     });
 
     (supportsESM ? describe : describe.skip)(".mjs files", () => {
-      it("called synchronously", async () => {
+      nodeLt23("called synchronously", async () => {
         process.chdir("preset-mjs-native");
 
         await expect(spawnTransformSync()).rejects.toThrow(
           `[BABEL]: You appear to be using a native ECMAScript module preset, which is` +
             ` only supported when running Babel asynchronously`,
         );
+      });
+
+      nodeGte23("called synchronously", async () => {
+        process.chdir("preset-mjs-native");
+
+        await expect(spawnTransformSync()).resolves.toMatchObject({
+          code: `"success"`,
+        });
       });
 
       it("called asynchronously", async () => {
@@ -308,7 +380,7 @@ describe("asynchronicity", () => {
   });
 
   describe("misc", () => {
-    it("unknown preset in config file does not trigget unhandledRejection if caught", async () => {
+    it("unknown preset in config file does not trigger unhandledRejection if caught", async () => {
       process.chdir("unknown-preset");
       const handler = jest.fn();
 

@@ -48,9 +48,6 @@
       "path": "../../packages/babel-plugin-proposal-import-defer"
     },
     {
-      "path": "../../packages/babel-plugin-proposal-json-modules"
-    },
-    {
       "path": "../../packages/babel-plugin-proposal-optional-chaining-assign"
     },
     {
@@ -58,9 +55,6 @@
     },
     {
       "path": "../../packages/babel-plugin-proposal-record-and-tuple"
-    },
-    {
-      "path": "../../packages/babel-plugin-proposal-regexp-modifiers"
     },
     {
       "path": "../../packages/babel-plugin-proposal-throw-expressions"
@@ -180,6 +174,9 @@
       "path": "../../packages/babel-plugin-transform-jscript"
     },
     {
+      "path": "../../packages/babel-plugin-transform-json-modules"
+    },
+    {
       "path": "../../packages/babel-plugin-transform-json-strings"
     },
     {
@@ -277,6 +274,9 @@
     },
     {
       "path": "../../packages/babel-plugin-transform-regenerator"
+    },
+    {
+      "path": "../../packages/babel-plugin-transform-regexp-modifiers"
     },
     {
       "path": "../../packages/babel-plugin-transform-reserved-words"

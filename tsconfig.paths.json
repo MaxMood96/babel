@@ -101,9 +101,6 @@
       "@babel/helpers": [
         "./packages/babel-helpers/src"
       ],
-      "@babel/highlight": [
-        "./packages/babel-highlight/src"
-      ],
       "@babel/node": [
         "./packages/babel-node/src"
       ],
@@ -161,9 +158,6 @@
       "@babel/plugin-proposal-import-wasm-source": [
         "./packages/babel-plugin-proposal-import-wasm-source/src"
       ],
-      "@babel/plugin-proposal-json-modules": [
-        "./packages/babel-plugin-proposal-json-modules/src"
-      ],
       "@babel/plugin-proposal-optional-chaining-assign": [
         "./packages/babel-plugin-proposal-optional-chaining-assign/src"
       ],
@@ -175,9 +169,6 @@
       ],
       "@babel/plugin-proposal-record-and-tuple": [
         "./packages/babel-plugin-proposal-record-and-tuple/src"
-      ],
-      "@babel/plugin-proposal-regexp-modifiers": [
-        "./packages/babel-plugin-proposal-regexp-modifiers/src"
       ],
       "@babel/plugin-proposal-throw-expressions": [
         "./packages/babel-plugin-proposal-throw-expressions/src"
@@ -311,6 +302,9 @@
       "@babel/plugin-transform-jscript": [
         "./packages/babel-plugin-transform-jscript/src"
       ],
+      "@babel/plugin-transform-json-modules": [
+        "./packages/babel-plugin-transform-json-modules/src"
+      ],
       "@babel/plugin-transform-json-strings": [
         "./packages/babel-plugin-transform-json-strings/src"
       ],
@@ -415,6 +409,9 @@
       ],
       "@babel/plugin-transform-regenerator": [
         "./packages/babel-plugin-transform-regenerator/src"
+      ],
+      "@babel/plugin-transform-regexp-modifiers": [
+        "./packages/babel-plugin-transform-regexp-modifiers/src"
       ],
       "@babel/plugin-transform-reserved-words": [
         "./packages/babel-plugin-transform-reserved-words/src"

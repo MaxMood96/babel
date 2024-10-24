@@ -1950,10 +1950,7 @@ export default (superClass: typeof Parser) =>
           this.next();
           return this.flowParseInterface(node);
         }
-      } else if (
-        (process.env.BABEL_8_BREAKING || this.plugins.get("flow").enums) &&
-        this.isContextual(tt._enum)
-      ) {
+      } else if (this.isContextual(tt._enum)) {
         const node = this.startNode();
         this.next();
         return this.flowParseEnumDeclaration(node);
@@ -2004,11 +2001,7 @@ export default (superClass: typeof Parser) =>
     // export type
     shouldParseExportDeclaration(): boolean {
       const { type } = this.state;
-      if (
-        tokenIsFlowInterfaceOrTypeOrOpaque(type) ||
-        ((process.env.BABEL_8_BREAKING || this.plugins.get("flow").enums) &&
-          type === tt._enum)
-      ) {
+      if (type === tt._enum || tokenIsFlowInterfaceOrTypeOrOpaque(type)) {
         return !this.state.containsEsc;
       }
       return super.shouldParseExportDeclaration();
@@ -2016,11 +2009,7 @@ export default (superClass: typeof Parser) =>
 
     isExportDefaultSpecifier(): boolean {
       const { type } = this.state;
-      if (
-        tokenIsFlowInterfaceOrTypeOrOpaque(type) ||
-        ((process.env.BABEL_8_BREAKING || this.plugins.get("flow").enums) &&
-          type === tt._enum)
-      ) {
+      if (type === tt._enum || tokenIsFlowInterfaceOrTypeOrOpaque(type)) {
         return this.state.containsEsc;
       }
 
@@ -2028,10 +2017,7 @@ export default (superClass: typeof Parser) =>
     }
 
     parseExportDefaultExpression() {
-      if (
-        (process.env.BABEL_8_BREAKING || this.plugins.get("flow").enums) &&
-        this.isContextual(tt._enum)
-      ) {
+      if (this.isContextual(tt._enum)) {
         const node = this.startNode();
         this.next();
         return this.flowParseEnumDeclaration(node);
@@ -2280,10 +2266,7 @@ export default (superClass: typeof Parser) =>
         this.next();
         // @ts-expect-error: refine typings
         return this.flowParseInterface(declarationNode);
-      } else if (
-        (process.env.BABEL_8_BREAKING || this.plugins.get("flow").enums) &&
-        this.isContextual(tt._enum)
-      ) {
+      } else if (this.isContextual(tt._enum)) {
         node.exportKind = "value";
         const declarationNode = this.startNode();
         this.next();
@@ -3170,7 +3153,7 @@ export default (superClass: typeof Parser) =>
 
         const node = this.startNodeAt<N.CallExpression>(startLoc);
         node.callee = base;
-        node.arguments = super.parseCallExpressionArguments(tt.parenR, false);
+        node.arguments = super.parseCallExpressionArguments(tt.parenR);
         base = this.finishNode(node, "CallExpression");
       } else if (
         base.type === "Identifier" &&
@@ -3229,7 +3212,7 @@ export default (superClass: typeof Parser) =>
         node.callee = base;
         node.typeArguments = this.flowParseTypeParameterInstantiation();
         this.expect(tt.parenL);
-        node.arguments = this.parseCallExpressionArguments(tt.parenR, false);
+        node.arguments = this.parseCallExpressionArguments(tt.parenR);
         node.optional = true;
         return this.finishCallExpression(node, /* optional */ true);
       } else if (!noCalls && this.shouldParseTypes() && this.match(tt.lt)) {
@@ -3242,7 +3225,7 @@ export default (superClass: typeof Parser) =>
           node.typeArguments =
             this.flowParseTypeParameterInstantiationCallOrNew();
           this.expect(tt.parenL);
-          node.arguments = super.parseCallExpressionArguments(tt.parenR, false);
+          node.arguments = super.parseCallExpressionArguments(tt.parenR);
           if (subscriptState.optionalChainMember) {
             (node as Undone<N.OptionalCallExpression>).optional = false;
           }

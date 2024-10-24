@@ -1185,12 +1185,18 @@ export interface DeclareExportDeclaration extends BaseNode {
   declaration?: Flow | null;
   specifiers?: Array<ExportSpecifier | ExportNamespaceSpecifier> | null;
   source?: StringLiteral | null;
+  attributes?: Array<ImportAttribute> | null;
+  /** @deprecated */
+  assertions?: Array<ImportAttribute> | null;
   default?: boolean | null;
 }
 
 export interface DeclareExportAllDeclaration extends BaseNode {
   type: "DeclareExportAllDeclaration";
   source: StringLiteral;
+  attributes?: Array<ImportAttribute> | null;
+  /** @deprecated */
+  assertions?: Array<ImportAttribute> | null;
   exportKind?: "type" | "value" | null;
 }
 
@@ -2021,6 +2027,7 @@ export interface TSModuleDeclaration extends BaseNode {
   body: TSModuleBlock | TSModuleDeclaration;
   declare?: boolean | null;
   global?: boolean | null;
+  kind: "global" | "module" | "namespace";
 }
 
 export interface TSModuleBlock extends BaseNode {
@@ -4692,6 +4699,8 @@ export interface ParentMaps {
     | WithStatement
     | YieldExpression;
   ImportAttribute:
+    | DeclareExportAllDeclaration
+    | DeclareExportDeclaration
     | ExportAllDeclaration
     | ExportNamedDeclaration
     | ImportDeclaration;

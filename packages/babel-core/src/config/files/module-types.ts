@@ -71,7 +71,8 @@ function loadCjsDefault(filepath: string) {
 const loadMjsFromPath = endHiddenCallStack(async function loadMjsFromPath(
   filepath: string,
 ) {
-  const url = pathToFileURL(filepath).toString();
+  // Add ?import as a workaround for https://github.com/nodejs/node/issues/55500
+  const url = pathToFileURL(filepath).toString() + "?import";
 
   if (process.env.BABEL_8_BREAKING) {
     return await import(url);
@@ -89,6 +90,8 @@ const loadMjsFromPath = endHiddenCallStack(async function loadMjsFromPath(
 
 const SUPPORTED_EXTENSIONS = new Set([".js", ".mjs", ".cjs", ".cts"] as const);
 type SetValue<T extends Set<unknown>> = T extends Set<infer U> ? U : never;
+
+const asyncModules = new Set();
 
 export default function* loadCodeDefault(
   filepath: string,
@@ -133,15 +136,25 @@ export default function* loadCodeDefault(
         }
       } catch (e) {
         if (
-          e.code === "ERR_REQUIRE_ASYNC_MODULE" &&
-          !(async ??= yield* isAsync())
+          e.code === "ERR_REQUIRE_ASYNC_MODULE" ||
+          // Node.js 13.0.0 throws ERR_REQUIRE_CYCLE_MODULE instead of
+          // ERR_REQUIRE_ASYNC_MODULE when requiring a module a second time
+          // https://github.com/nodejs/node/issues/55516
+          // This `asyncModules` won't catch all of such cases, but it will
+          // at least catch those caused by Babel trying to load a module twice.
+          (e.code === "ERR_REQUIRE_CYCLE_MODULE" && asyncModules.has(filepath))
         ) {
-          throw new ConfigError(tlaError, filepath);
-        }
-        if (
-          e.code !== "ERR_REQUIRE_ESM" &&
-          (process.env.BABEL_8_BREAKING || ext !== ".mjs")
+          asyncModules.add(filepath);
+          if (!(async ??= yield* isAsync())) {
+            throw new ConfigError(tlaError, filepath);
+          }
+          // fall through: require() failed due to TLA
+        } else if (
+          e.code === "ERR_REQUIRE_ESM" ||
+          (!process.env.BABEL_8_BREAKING && ext === ".mjs")
         ) {
+          // fall through: require() failed due to ESM
+        } else {
           throw e;
         }
       }

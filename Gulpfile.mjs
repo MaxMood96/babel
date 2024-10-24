@@ -410,6 +410,7 @@ function buildRollup(packages, buildStandalone) {
                 bool(process.env.BABEL_8_BREAKING)
                   ? [
                       // These require()s are all in babel-preset-env/src/polyfills/babel-7-plugins.cjs
+                      // and packages/babel-preset-env/src/babel-7-available-plugins.cjs.
                       // They are gated by a !process.env.BABEL_8_BREAKING check, but
                       // @rollup/plugin-commonjs extracts them to import statements outside of the
                       // check and thus they end up in the final bundle.
@@ -418,6 +419,8 @@ function buildRollup(packages, buildStandalone) {
                       "./babel-polyfill.cjs",
                       "./regenerator.cjs",
                       "@babel/compat-data/corejs2-built-ins",
+                      "@babel/plugin-syntax-import-assertions",
+                      "@babel/plugin-syntax-import-attributes",
                     ]
                   : [],
               dynamicRequireTargets: [
@@ -521,7 +524,7 @@ function buildRollup(packages, buildStandalone) {
             // We have manually applied commonjs-esm interop to the source
             // for library not in this monorepo
             // https://github.com/babel/babel/pull/12795
-            if (!id.startsWith("@babel/")) return "compat";
+            if (!id.startsWith("@babel/")) return "default";
 
             // Some syntax plugins have been archived
             if (id.includes("plugin-syntax")) {
@@ -529,11 +532,11 @@ function buildRollup(packages, buildStandalone) {
                 path.dirname(fileURLToPath(import.meta.url)),
                 "/packages/" + id.replace("@babel/", "babel-")
               );
-              if (!fs.existsSync(srcPath)) return "compat";
+              if (!fs.existsSync(srcPath)) return "default";
             }
 
             if (id.includes("@babel/preset-modules")) {
-              return "compat";
+              return "default";
             }
 
             return "auto";
@@ -732,6 +735,7 @@ if (bool(process.env.BABEL_8_BREAKING)) {
   libBundles = Array.from(libBundlesIterator());
 } else {
   libBundles = [
+    "packages/babel-code-frame",
     "packages/babel-parser",
     "packages/babel-plugin-proposal-destructuring-private",
     "packages/babel-plugin-transform-object-rest-spread",

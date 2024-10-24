@@ -566,23 +566,11 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
       // For compatibility to estree we cannot call parseLiteral directly here
       node.argument = super.parseExprAtom() as N.StringLiteral;
-      if (
-        this.hasPlugin("importAttributes") ||
-        (!process.env.BABEL_8_BREAKING && this.hasPlugin("importAssertions"))
-      ) {
+      if (this.eat(tt.comma) && !this.match(tt.parenR)) {
+        node.options = super.parseMaybeAssignAllowIn();
+        this.eat(tt.comma);
+      } else {
         node.options = null;
-      }
-      if (this.eat(tt.comma)) {
-        if (
-          process.env.BABEL_8_BREAKING ||
-          !this.hasPlugin("importAssertions")
-        ) {
-          this.expectPlugin("importAttributes");
-        }
-        if (!this.match(tt.parenR)) {
-          node.options = super.parseMaybeAssignAllowIn();
-          this.eat(tt.comma);
-        }
       }
       this.expect(tt.parenR);
 
@@ -1948,9 +1936,11 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       node: N.TsModuleDeclaration,
     ): N.TsModuleDeclaration {
       if (this.isContextual(tt._global)) {
+        node.kind = "global";
         node.global = true;
         node.id = this.parseIdentifier();
       } else if (this.match(tt.string)) {
+        node.kind = "module";
         node.id = super.parseStringLiteral(this.state.value);
       } else {
         this.unexpected();
@@ -2151,6 +2141,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
             this.scope.enter(ScopeFlag.TS_MODULE);
             this.prodParam.enter(ParamKind.PARAM);
             const mod = node;
+            mod.kind = "global";
             mod.global = true;
             mod.id = expr;
             mod.body = this.tsParseModuleBlock();
@@ -2193,6 +2184,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
             if (this.match(tt.string)) {
               return this.tsParseAmbientExternalModuleDeclaration(node);
             } else if (tokenIsIdentifier(this.state.type)) {
+              node.kind = "module";
               return this.tsParseModuleOrNamespaceDeclaration(node);
             }
           }
@@ -2203,6 +2195,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
             this.tsCheckLineTerminator(next) &&
             tokenIsIdentifier(this.state.type)
           ) {
+            node.kind = "namespace";
             return this.tsParseModuleOrNamespaceDeclaration(node);
           }
           break;
@@ -2545,12 +2538,8 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
               N.CallExpression | N.OptionalCallExpression
             >(startLoc);
             node.callee = base;
-            // possibleAsync always false here, because we would have handled it above.
             // @ts-expect-error (won't be any undefined arguments)
-            node.arguments = this.parseCallExpressionArguments(
-              tt.parenR,
-              /* possibleAsync */ false,
-            );
+            node.arguments = this.parseCallExpressionArguments(tt.parenR);
 
             // Handles invalid case: `f<T>(a:b)`
             this.tsCheckForInvalidTypeCasts(node.arguments);

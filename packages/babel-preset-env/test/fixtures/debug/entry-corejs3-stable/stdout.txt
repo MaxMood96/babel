@@ -9,6 +9,7 @@ Using modules transform: auto
 
 Using plugins:
   transform-duplicate-named-capturing-groups-regex { ie }
+  transform-regexp-modifiers { ie }
   transform-unicode-sets-regex { ie }
   transform-class-static-block { ie }
   transform-private-property-in-object { ie }
@@ -54,7 +55,6 @@ Using plugins:
   transform-export-namespace-from { ie }
   transform-modules-commonjs
   transform-dynamic-import
-  syntax-import-attributes
 corejs3: `DEBUG` option
 
 Using targets: {
